@@ -1,3 +1,5 @@
 black
 pyright
 pre-commit
+numpy == 1.26.4
+pillow
