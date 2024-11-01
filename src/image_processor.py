@@ -40,7 +40,7 @@ class ImageProcessor:
         """
         image = Image.open(image_path)
         resized_image = self._image_resizing(image, image_size)
-        padded_image = self._add_padding(resized_image)
+        padded_image = self._add_padding(resized_image, image_size)
         self._save(padded_image, image_path)
 
     @staticmethod
@@ -70,7 +70,7 @@ class ImageProcessor:
         return image.resize((new_width, new_height))
 
     @staticmethod
-    def _add_padding(resized_image: Image.Image) -> Image.Image:
+    def _add_padding(resized_image: Image.Image, image_size: int) -> Image.Image:
         """Add some padding to the image if it is not a square
             - Padding will be added to the right if width < height
             - Padding will be added to the bottom if width > height
@@ -79,6 +79,7 @@ class ImageProcessor:
 
         Args:
             resized_image (Image.Image): image to add padding
+            image_size (int): size of the image to resize to
 
         Returns:
             Image.Image: image with padding
@@ -86,14 +87,9 @@ class ImageProcessor:
         width, height = resized_image.size
         if width == height:
             return resized_image
-        elif width < height:
-            color = (114, 114, 144) if resized_image.mode == "RGB" else 114
-            result = Image.new(resized_image.mode, (height, height), color)
-            result.paste(resized_image, (0, 0))
-            return result
         else:
             color = (114, 114, 144) if resized_image.mode == "RGB" else 114
-            result = Image.new(resized_image.mode, (width, width), color)
+            result = Image.new(resized_image.mode, (image_size, image_size), color)
             result.paste(resized_image, (0, 0))
             return result
 
