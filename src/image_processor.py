@@ -9,25 +9,21 @@ IMAGE_SIZE: Final[int] = 640
 
 class ImageProcessor:
 
-    def __init__(self, path_to_images_folder: str) -> None:
+    def __init__(self, path_to_images_folder: str, image_size: int = IMAGE_SIZE) -> None:
         if not os.path.isdir(path_to_images_folder):
             raise ValueError(f"This folder {path_to_images_folder} doesnt exist")
         self.path_to_images_folder = path_to_images_folder
+        self.image_size = image_size
         self.current_date = datetime.now().strftime("%Y%m%d%H%M%S")
 
-    def process_folder(self, image_size: int = IMAGE_SIZE) -> None:
-        """Create an output folder, loop inside the images folder and process them
-
-        Args :
-            image_size (int): size of the image to resize to.
-            (image_size x image_size) Default is IMAGE_SIZE (640px).
-        """
-        self._create_output_images_folder()
+    def process_folder(self) -> None:
+        """Create an output folder, loop inside the images folder and process them"""
+        self.__create_output_images_folder()
         for image in os.listdir(self.path_to_images_folder):
             path_to_image = f"{self.path_to_images_folder}/{image}"
-            self.process_image(path_to_image, image_size)
+            self.process_image(path_to_image)
 
-    def process_image(self, image_path: str, image_size: int) -> None:
+    def process_image(self, image_path: str) -> None:
         """Process image like so :
             - Open it
             - Resize it to a square format
@@ -36,15 +32,13 @@ class ImageProcessor:
 
         Args:
             image_path (str): path to the image to process
-            image_size (int): size of the image to resize to
         """
         image = Image.open(image_path)
-        resized_image = self._image_resizing(image, image_size)
-        padded_image = self._add_padding(resized_image, image_size)
-        self._save(padded_image, image_path)
+        resized_image = self.__image_resizing(image)
+        padded_image = self.__add_padding(resized_image)
+        self.__save(padded_image, image_path)
 
-    @staticmethod
-    def _image_resizing(image: Image.Image, image_size: int) -> Image.Image:
+    def __image_resizing(self, image: Image.Image) -> Image.Image:
         """Resize the image to a square format, using a specific size
             - Used with resize() from pillow
             - Handle case where width is greater, smaller or equal to height
@@ -52,25 +46,23 @@ class ImageProcessor:
 
         Args:
             image (Image.Image): image to resize
-            image_size (int): size of the image to resize to
 
         Returns:
             Image.Image: resized image
         """
         width, height = image.size
         if width > height:
-            new_width = image_size
-            new_height = int(height * (image_size / width))
+            new_width = self.image_size
+            new_height = int(height * (self.image_size / width))
         elif width < height:
-            new_width = int(width * (image_size / height))
-            new_height = image_size
+            new_width = int(width * (self.image_size / height))
+            new_height = self.image_size
         else:
-            new_width = new_height = image_size
+            new_width = new_height = self.image_size
 
         return image.resize((new_width, new_height))
 
-    @staticmethod
-    def _add_padding(resized_image: Image.Image, image_size: int) -> Image.Image:
+    def __add_padding(self, resized_image: Image.Image) -> Image.Image:
         """Add some padding to the image if it is not a square
             - Padding will be added to the right if width < height
             - Padding will be added to the bottom if width > height
@@ -79,7 +71,6 @@ class ImageProcessor:
 
         Args:
             resized_image (Image.Image): image to add padding
-            image_size (int): size of the image to resize to
 
         Returns:
             Image.Image: image with padding
@@ -89,11 +80,13 @@ class ImageProcessor:
             return resized_image
         else:
             color = (114, 114, 144) if resized_image.mode == "RGB" else 114
-            result = Image.new(resized_image.mode, (image_size, image_size), color)
+            result = Image.new(
+                resized_image.mode, (self.image_size, self.image_size), color
+            )
             result.paste(resized_image, (0, 0))
             return result
 
-    def _save(self, image: Image.Image, image_path: str) -> None:
+    def __save(self, image: Image.Image, image_path: str) -> None:
         """Save the image inside dataset folder inside a folder with the current date
 
         Args:
@@ -103,7 +96,7 @@ class ImageProcessor:
         image_name = image_path.split("/")[-1]
         image.save(f"dataset/{self.current_date}/{image_name}")
 
-    def _create_output_images_folder(self) -> None:
+    def __create_output_images_folder(self) -> None:
         if not os.path.isdir("dataset"):
             os.mkdir("dataset")
         if not os.path.isdir(f"dataset/{self.current_date}"):
