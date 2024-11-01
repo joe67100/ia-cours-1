@@ -20,12 +20,12 @@ class ImageProcessor:
 
     def process_folder(self) -> None:
         """Create an output folder, loop inside the images folder and process them"""
-        self.__create_output_images_folder()
+        os.makedirs(self.output_folder, exist_ok=True)
         for image in os.listdir(self.path_to_images_folder):
             path_to_image = f"{self.path_to_images_folder}/{image}"
-            self.process_image(path_to_image)
+            self._process_image(path_to_image)
 
-    def process_image(self, image_path: str) -> None:
+    def _process_image(self, image_path: str) -> None:
         """Process image like so :
             - Open it
             - Resize it to a square format
@@ -36,11 +36,11 @@ class ImageProcessor:
             image_path (str): path to the image to process
         """
         image = Image.open(image_path)
-        resized_image = self.__image_resizing(image)
-        padded_image = self.__add_padding(resized_image)
-        self.__save(padded_image, image_path)
+        resized_image = self._image_resizing(image)
+        padded_image = self._add_padding(resized_image)
+        self._save(padded_image, image_path)
 
-    def __image_resizing(self, image: Image.Image) -> Image.Image:
+    def _image_resizing(self, image: Image.Image) -> Image.Image:
         """Resize the image to a square format, using a specific size
             - Used with resize() from pillow
             - Handle case where width is greater, smaller or equal to height
@@ -64,12 +64,11 @@ class ImageProcessor:
 
         return image.resize((new_width, new_height))
 
-    def __add_padding(self, resized_image: Image.Image) -> Image.Image:
+    def _add_padding(self, resized_image: Image.Image) -> Image.Image:
         """Add some padding to the image if it is not a square
             - Padding will be added to the right if width < height
             - Padding will be added to the bottom if width > height
-            - Unique color (114, 114, 144) is used
-            - 114, 114, 144 won't work if its L mode
+            - Unique color (114, 114, 144) is used for RGV mode, 114 for L mode
 
         Args:
             resized_image (Image.Image): image to add padding
@@ -88,7 +87,7 @@ class ImageProcessor:
             result.paste(resized_image, (0, 0))
             return result
 
-    def __save(self, image: Image.Image, image_path: str) -> None:
+    def _save(self, image: Image.Image, image_path: str) -> None:
         """Save the image inside dataset folder inside a folder with the current date
 
         Args:
@@ -98,6 +97,3 @@ class ImageProcessor:
         image_name = image_path.split("/")[-1]
         output_path = os.path.join(self.output_folder, image_name)
         image.save(output_path)
-
-    def __create_output_images_folder(self) -> None:
-        os.makedirs(self.output_folder, exist_ok=True)
