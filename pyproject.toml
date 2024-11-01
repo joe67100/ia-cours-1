@@ -1,0 +1,7 @@
+[tool.pyright]
+exclude = ["**/node_modules",
+    "**/__pycache__",
+]
+strict = ["src", "."]
+venvPath = "."
+venv = ".venv"
