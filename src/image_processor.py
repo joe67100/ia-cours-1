@@ -5,6 +5,7 @@ from datetime import datetime
 
 
 IMAGE_SIZE: Final[int] = 640
+DATASET_FOLDER: Final = "dataset"
 
 
 class ImageProcessor:
@@ -15,6 +16,7 @@ class ImageProcessor:
         self.path_to_images_folder = path_to_images_folder
         self.image_size = image_size
         self.current_date = datetime.now().strftime("%Y%m%d%H%M%S")
+        self.output_folder = os.path.join(DATASET_FOLDER, self.current_date)
 
     def process_folder(self) -> None:
         """Create an output folder, loop inside the images folder and process them"""
@@ -94,10 +96,8 @@ class ImageProcessor:
             image_path (str): the path to the image to save
         """
         image_name = image_path.split("/")[-1]
-        image.save(f"dataset/{self.current_date}/{image_name}")
+        output_path = os.path.join(self.output_folder, image_name)
+        image.save(output_path)
 
     def __create_output_images_folder(self) -> None:
-        if not os.path.isdir("dataset"):
-            os.mkdir("dataset")
-        if not os.path.isdir(f"dataset/{self.current_date}"):
-            os.mkdir(f"dataset/{self.current_date}")
+        os.makedirs(self.output_folder, exist_ok=True)
