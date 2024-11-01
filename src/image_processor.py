@@ -1,6 +1,7 @@
 class ImageProcessor:
-    def __init__(self, path_to_images_folder: str) -> None:
+
+    def __init__(self, path_to_images_folder):
         self.path_to_images_folder = path_to_images_folder
 
-    def process_folder(self):
+    def Process_Folder(self):
         pass
