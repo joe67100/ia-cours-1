@@ -8,3 +8,23 @@ venv = "venv"
 
 [tool.black]
 line-length = 100
+
+[tool.poetry]
+name = "ia-cours-1"
+version = "0.1.0"
+description = ""
+authors = ["Joé FEUCHT <71235356+joe67100@users.noreply.github.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+pillow = "^11.0.0"
+pre-commit = "^4.0.1"
+pyright = "^1.1.387"
+black = "^24.10.0"
+numpy = "1.26.4"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
